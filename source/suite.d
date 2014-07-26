@@ -4,16 +4,16 @@ import std.stdio;
 import runnable;
 
 alias void delegate(Spec) SpecBlock;
-alias void delegate(Context) ContextBlock;
+alias void delegate(Suite) SuiteBlock;
 
 class Spec : Runnable
 {
   SpecBlock block;
 
-  this(const string title_, ref Context context_, SpecBlock block_)
+  this(const string title_, ref Suite suite_, SpecBlock block_)
   {
     block = block_;
-    super(title_, context_);
+    super(title_, suite_);
   }
 
   override void run()
@@ -26,7 +26,7 @@ class Spec : Runnable
 
   unittest
   {
-    auto parent = new Context("mock context");
+    auto parent = new Suite("mock suite");
     Spec spec;
 
     // test success
@@ -57,13 +57,13 @@ class Spec : Runnable
   }
 }
 
-class Context : Runnable
+class Suite : Runnable
 {
   bool isRoot = false;
-  Context[] children;
+  Suite[] children;
   Spec[] specs;
 
-  this(const string title_, ref Context parent_)
+  this(const string title_, ref Suite parent_)
   {
     super(title_, parent_);
   }
@@ -81,21 +81,21 @@ class Context : Runnable
       spec.run;
     }
 
-    foreach(Context child; children)
+    foreach(Suite child; children)
     {
       child.run;
     }
   }
 
-  Context describe(const string title, ContextBlock block)
+  Suite describe(const string title, SuiteBlock block)
   {
-    auto context = new Context(title, this);
-    children ~= context;
-    block(context);
+    auto suite = new Suite(title, this);
+    children ~= suite;
+    block(suite);
     return this;
   }
 
-  Context it(const string title, SpecBlock block)
+  Suite it(const string title, SpecBlock block)
   {
     auto spec = new Spec(title, this, block);
     spec.connect(&propagateFailure);
@@ -107,7 +107,7 @@ class Context : Runnable
   {
     int called = 0;
 
-    auto t = new Context("Testing");
+    auto t = new Suite("Testing");
 
     t.it("Aw", (t) { called++; });
     t.it("Such wow", (t) { called++; });

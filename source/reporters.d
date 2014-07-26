@@ -1,9 +1,9 @@
-import context;
+import suite;
 import runnable;
 
 class Reporter
 {
-  this(Context context);
+  this(Suite suite);
 }
 
 class SpecReporter
@@ -31,22 +31,22 @@ class SpecReporter
   int nfailed;
   int nsucceeded;
 
-  this(Context context)
+  this(Suite suite)
   {
     writeln("\nRunning tests\n");
     failures = [];
     app = appender(&failures);
-    draw(context);
+    draw(suite);
   }
 
-  void draw(Context context, const string indent = "  ")
+  void draw(Suite suite, const string indent = "  ")
   {
-    writeln(indent ~ context.title);
+    writeln(indent ~ suite.title);
     height++;
 
     auto cindent = indent ~ "  ";
 
-    foreach(spec; context.specs)
+    foreach(spec; suite.specs)
     {
       specPositions[spec.title] = Point(cindent.length.to!int, height);
       attachListener(spec);
@@ -56,9 +56,9 @@ class SpecReporter
       ntests++;
     }
 
-    foreach(child; context.children) draw(child, cindent);
+    foreach(child; suite.children) draw(child, cindent);
 
-    if(context.isRoot)
+    if(suite.isRoot)
     {
       writeln();
       height++;

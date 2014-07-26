@@ -1,16 +1,16 @@
-import context;
+import suite;
 import reporters;
 import runnable;
 
-void describe(R = SpecReporter)(string title, ContextBlock block)
+void describe(R = SpecReporter)(string title, SuiteBlock block)
 {
-  auto context = new Context(title);
-  block(context);
+  auto suite = new Suite(title);
+  block(suite);
 
-  auto rep = new R(context);
-  context.run();
+  auto rep = new R(suite);
+  suite.run();
 
-  assert(!context.failed, "One or more tests failed");
+  assert(!suite.failed, "One or more tests failed");
 }
 
 unittest
