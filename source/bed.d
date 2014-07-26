@@ -31,18 +31,22 @@ unittest
       assert(add(1, 10) == 11);
     })
 
+    /*
     .it("2 + 2 = 5", (t) {
       assert(add(2, 2) == 5, "what the hell happened?");
     })
+    */
 
     .describe("when x is a negative number", (t) { t
       .it("-10 + 2 = -8", (t) {
         assert(add(-10, 2) == -8);
-      })
+      });
 
+      /*
       .it("-2 - 2 = -5", (t) {
         assert(add(-2, -2) == -5, "oh my!");
       });
+      */
     });
   });
 }
