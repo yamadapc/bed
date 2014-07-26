@@ -30,12 +30,16 @@ unittest
     });
 
     t.it("2 + 2 = 5", (t) {
-      assert(add(2, 2) == 5);
+      assert(add(2, 2) == 5, "what the hell happened?");
     });
 
     t.describe("when x is a negative number", (t) {
       t.it("-10 + 2 = -8", (t) {
         assert(add(-10, 2) == -8);
+      });
+
+      t.it("-2 - 2 = -5", (t) {
+        assert(add(-2, -2) == -5, "oh my!");
       });
     });
   });
