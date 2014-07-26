@@ -11,7 +11,7 @@ class Reporter
 
 class SpecReporter
 {
-  import std.stdio : writeln, writef;
+  import std.stdio : writeln, writefln, writef, write;
   import colorize : colorize, fg;
 
   alias Tuple!(int, int) Point;
@@ -22,6 +22,9 @@ class SpecReporter
 
   Point[string] specPositions;
   int height;
+  int ntests;
+  int nfailed;
+  int nsucceeded;
 
   this(Context context)
   {
@@ -43,11 +46,16 @@ class SpecReporter
 
       writeln(cindent, pending, spec.title.colorize(fg.light_black));
       height++;
+      ntests++;
     }
 
     foreach(child; context.children) draw(child, cindent);
 
-    if(context.isRoot) writeln();
+    if(context.isRoot)
+    {
+      writeln();
+      height++;
+    }
   }
 
   void attachListener(Spec spec)
@@ -57,8 +65,37 @@ class SpecReporter
     );
   }
 
-  void updateSpec(string specTitle, bool succeeded)
+  void updateSpec(string specTitle, bool ok)
   {
-    // todo
+    write("\033[s"); // save cursor position
+
+    auto pos = specPositions[specTitle];
+
+    writef("\033[%dA", height - pos[1]);
+    write("\033[K"); // delete until the end of the line
+
+    auto indent = "";
+    for(auto i = 0; i < pos[0]; i++) indent ~= " ";
+
+    if(ok)
+    {
+      nsucceeded++;
+      write(indent, succeeded, specTitle.colorize(fg.light_black));
+    }
+    else
+    {
+      nfailed++;
+      write(indent, failed, specTitle.colorize(fg.red));
+    }
+
+    write("\033[u"); // return to where we were
+
+    // We are done, print summary
+    if(nsucceeded + nfailed == ntests)
+    {
+      writefln("  %d passing".colorize(fg.green), nsucceeded);
+      writefln("  %d failing".colorize(fg.red), nfailed);
+      writeln();
+    }
   }
 }

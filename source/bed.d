@@ -1,5 +1,5 @@
 import context;
-import reporter;
+import reporters;
 import runnable;
 
 void describe(R = SpecReporter)(string title, ContextBlock block)
