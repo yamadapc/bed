@@ -15,10 +15,3 @@ void describe(R = SpecReporter)(string title, SuiteBlock block)
 
   assert(!suite.failed, "One or more tests failed");
 }
-
-unittest
-{
-  import test.spec;
-  import test.runnable;
-  import test.suite;
-}
