@@ -67,9 +67,7 @@ class SpecReporter
 
   void attachListener(Spec spec)
   {
-    spec.addListener(
-      (e) => updateSpec(spec.title, e)
-    );
+    spec.connect(&updateSpec);
   }
 
   void updateSpec(string specTitle, Throwable e)

@@ -1,4 +1,3 @@
-import std.array : appender, RefAppender;
 import std.exception : collectException;
 import std.stdio;
 
@@ -32,15 +31,11 @@ class Spec : Runnable
 
     // test success
     auto testRan = false;
-    auto handlerCalled = false;
     spec = new Spec("test success", parent, (t) { testRan = true; });
-    spec.addListener((e) { assert(e is null); handlerCalled = true; });
     spec.run();
     assert(testRan, "Test didn't ran");
-    assert(handlerCalled, "Success handler wasn't called");
 
     // test exception
-    auto exceptionCaught = false;
     spec = new Spec(
       "test failure",
       parent,
@@ -48,12 +43,9 @@ class Spec : Runnable
         throw new Exception("Wow");
       }
     );
-    spec.addListener((e) { if(e.msg == "Wow") exceptionCaught = true; });
     spec.run();
-    assert(exceptionCaught == true);
 
     // test error
-    auto errorCaught = false;
     spec = new Spec(
       "test failure",
       parent,
@@ -61,9 +53,7 @@ class Spec : Runnable
         throw new Error("Such");
       }
     );
-    spec.addListener((e) { if(e.msg == "Such") errorCaught = true; });
     spec.run();
-    assert(errorCaught == true);
   }
 }
 
@@ -108,12 +98,7 @@ class Context : Runnable
   Context it(const string title, SpecBlock block)
   {
     auto spec = new Spec(title, this, block);
-    spec.addListener(
-      (e) {
-        // if we failed set all contexts until the root as failed
-        if(!(e is null)) propagateFailure();
-      }
-    );
+    spec.connect(&propagateFailure);
     specs ~= spec;
     return this;
   }
@@ -154,4 +139,3 @@ class Context : Runnable
     assert(called == 1);
   }
 }
-

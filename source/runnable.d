@@ -1,6 +1,6 @@
+import std.signals;
 import std.exception : collectException, AssertError;
 
-alias void delegate(Throwable e) Listener;
 alias void delegate(Runnable) Block;
 
 class Runnable
@@ -8,7 +8,6 @@ class Runnable
   bool failed = false;
   string title;
   Runnable parent;
-  Listener[] listeners;
 
   final this(const string title_, Runnable parent_)
   {
@@ -16,15 +15,11 @@ class Runnable
     parent = parent_;
   }
 
-  void addListener(Listener listener)
+  void propagateFailure(string title, Throwable e)
   {
-    listeners ~= listener;
-  }
+    if(e is null) return;
 
-  void propagateFailure()
-  {
     auto next = parent;
-
     while(next)
     {
       next.failed = true;
@@ -34,8 +29,10 @@ class Runnable
 
   void end(Throwable e)
   {
-    foreach(listener; listeners) listener(e);
+    emit(title, e);
   }
 
   abstract void run();
+
+  mixin Signal!(string, Throwable);
 }
