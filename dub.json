@@ -1,0 +1,11 @@
+{
+  "name": "bed",
+  "description": "Small BDD testing framework for D.",
+  "copyright": "Copyright © 2014, Pedro Tacla Yamada",
+  "authors": [
+    "Pedro Tacla Yamada"
+  ],
+  "dependencies": {
+    "colorize": ">=0.1.0"
+  }
+}
