@@ -5,8 +5,9 @@ alias void delegate(Runnable) Block;
 
 class Runnable
 {
-  Runnable parent;
+  bool failed = false;
   string title;
+  Runnable parent;
   Listener[] listeners;
 
   final this(const string title_, Runnable parent_)
@@ -18,6 +19,17 @@ class Runnable
   void addListener(Listener listener)
   {
     listeners ~= listener;
+  }
+
+  void propagateFailure()
+  {
+    auto next = parent;
+
+    while(next)
+    {
+      next.failed = true;
+      next = next.parent;
+    }
   }
 
   void end(Throwable e)

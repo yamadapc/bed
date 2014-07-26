@@ -7,8 +7,10 @@ void describe(R = SpecReporter)(string title, ContextBlock block)
   auto context = new Context(title);
   block(context);
 
-  new R(context);
+  auto rep = new R(context);
   context.run();
+
+  assert(!context.failed, "One or more tests failed");
 }
 
 unittest

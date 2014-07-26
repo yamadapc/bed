@@ -108,6 +108,12 @@ class Context : Runnable
   Context it(const string title, SpecBlock block)
   {
     auto spec = new Spec(title, this, block);
+    spec.addListener(
+      (e) {
+        // if we failed set all contexts until the root as failed
+        if(!(e is null)) propagateFailure();
+      }
+    );
     specs ~= spec;
     return this;
   }
