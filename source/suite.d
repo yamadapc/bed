@@ -9,15 +9,15 @@ class Suite : Runnable
   Suite[] children;
   Spec[] specs;
 
-  this(const string title_, ref Suite parent_)
+  this(const string title, ref Suite parent)
   {
-    super(title_, parent_);
+    super(title, parent);
   }
 
-  this(const string title_)
+  this(const string title)
   {
     isRoot = true;
-    super(title_, null);
+    super(title, null);
   }
 
   override void run()

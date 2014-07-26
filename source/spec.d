@@ -7,10 +7,10 @@ class Spec : Runnable
 {
   SpecBlock block;
 
-  this(const string title_, ref Suite suite_, SpecBlock block_)
+  this(const string title, Suite suite, SpecBlock _block)
   {
-    block = block_;
-    super(title_, suite_);
+    block = _block;
+    super(title, suite);
   }
 
   override void run()

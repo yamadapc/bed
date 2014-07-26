@@ -9,10 +9,10 @@ class Runnable
   string title;
   Runnable parent;
 
-  final this(const string title_, Runnable parent_)
+  final this(const string _title, Runnable _parent)
   {
-    title = title_;
-    parent = parent_;
+    title = _title;
+    parent = _parent;
   }
 
   void propagateFailure(string title, Throwable e)
