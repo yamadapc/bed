@@ -42,7 +42,7 @@ describe("add(x, y)", (t) { t
     .it("-2 - 2 = -5", (t) {
       assert(add(-2, -2) == -5, "oh my!");
     });
-  })
+  });
 });
 
 }
