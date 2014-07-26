@@ -1,6 +1,8 @@
 import runnable;
 import spec;
 
+version(unittest) import test.suite;
+
 alias void delegate(Suite) SuiteBlock;
 
 class Suite : Runnable
@@ -9,7 +11,7 @@ class Suite : Runnable
   Suite[] children;
   Spec[] specs;
 
-  this(const string title, ref Suite parent)
+  this(const string title, Suite parent)
   {
     super(title, parent);
   }
@@ -49,39 +51,4 @@ class Suite : Runnable
     return this;
   }
 
-  unittest
-  {
-    int called = 0;
-
-    auto t = new Suite("Testing");
-
-    t.it("Aw", (t) { called++; });
-    t.it("Such wow", (t) { called++; });
-    t.it("Much it", (t) { called++; });
-
-    t.describe("I'm nested", (t) {
-      t.it("And a infinite-branch tree structure", (t) {
-        called++;
-      });
-    });
-
-    assert(t.isRoot);
-    assert(t.title == "Testing");
-    assert(t.children.length == 1);
-    assert(t.specs.length == 3);
-    assert(t.children[0].title == "I'm nested");
-
-    auto child = t.children[0];
-    assert(!child.isRoot);
-    assert(child.children.length == 0);
-    assert(child.specs.length == 1);
-
-    t.run;
-
-    assert(called == 4);
-    called = 0;
-    child.run;
-
-    assert(called == 1);
-  }
 }

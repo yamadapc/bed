@@ -34,7 +34,6 @@ class SpecReporter
 
   this(Suite suite)
   {
-    writeln("\nRunning tests\n");
     failures = [];
     app = appender(&failures);
     draw(suite);

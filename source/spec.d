@@ -1,7 +1,7 @@
 import runnable;
 import suite;
 
-alias void delegate(Spec) SpecBlock;
+alias void delegate() SpecBlock;
 
 class Spec : Runnable
 {
@@ -16,40 +16,8 @@ class Spec : Runnable
   override void run()
   {
     Throwable e = null;
-    try block(this);
+    try block();
     catch(Throwable e_) e = e_;
     end(e);
-  }
-
-  unittest
-  {
-    auto parent = new Suite("mock suite");
-    Spec spec;
-
-    // test success
-    auto testRan = false;
-    spec = new Spec("test success", parent, (t) { testRan = true; });
-    spec.run();
-    assert(testRan, "Test didn't ran");
-
-    // test exception
-    spec = new Spec(
-      "test failure",
-      parent,
-      (t) {
-        throw new Exception("Wow");
-      }
-    );
-    spec.run();
-
-    // test error
-    spec = new Spec(
-      "test failure",
-      parent,
-      (t) {
-        throw new Error("Such");
-      }
-    );
-    spec.run();
   }
 }

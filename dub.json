@@ -7,5 +7,25 @@
   ],
   "dependencies": {
     "colorize": ">=0.1.0"
-  }
+  },
+  "configurations": [
+    {
+      "name": "library"
+    },
+    {
+      "name": "unittest",
+      "buildOptions": ["unittests"],
+      "targetType": "library",
+      "sourcePaths": [
+        "source"
+      ],
+      "sourceFiles": [
+        "source/suite.d",
+        "source/bed.d",
+        "source/reporters.d",
+        "source/runnable.d",
+        "source/spec.d"
+      ]
+    }
+  ]
 }
