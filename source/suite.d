@@ -1,61 +1,7 @@
-import std.exception : collectException;
-import std.stdio;
-
 import runnable;
+import spec;
 
-alias void delegate(Spec) SpecBlock;
 alias void delegate(Suite) SuiteBlock;
-
-class Spec : Runnable
-{
-  SpecBlock block;
-
-  this(const string title_, ref Suite suite_, SpecBlock block_)
-  {
-    block = block_;
-    super(title_, suite_);
-  }
-
-  override void run()
-  {
-    Throwable e = null;
-    try block(this);
-    catch(Throwable e_) e = e_;
-    end(e);
-  }
-
-  unittest
-  {
-    auto parent = new Suite("mock suite");
-    Spec spec;
-
-    // test success
-    auto testRan = false;
-    spec = new Spec("test success", parent, (t) { testRan = true; });
-    spec.run();
-    assert(testRan, "Test didn't ran");
-
-    // test exception
-    spec = new Spec(
-      "test failure",
-      parent,
-      (t) {
-        throw new Exception("Wow");
-      }
-    );
-    spec.run();
-
-    // test error
-    spec = new Spec(
-      "test failure",
-      parent,
-      (t) {
-        throw new Error("Such");
-      }
-    );
-    spec.run();
-  }
-}
 
 class Suite : Runnable
 {

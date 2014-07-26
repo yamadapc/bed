@@ -1,5 +1,6 @@
-import suite;
 import runnable;
+import suite;
+import spec;
 
 class Reporter
 {
