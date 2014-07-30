@@ -15,7 +15,8 @@ class SpecReporter
   import std.stdio : writeln, writefln, writef, write;
   import std.typecons : Tuple;
 
-  import colorize : colorize, fg;
+  import colorize : cwrite, cwriteln, cwritefln, fg;
+  import colorize.colorize : colorize;
 
   alias Tuple!(string, Throwable) Failure;
   alias Tuple!(int, int) Point;
@@ -51,7 +52,7 @@ class SpecReporter
       specPositions[spec.title] = Point(cindent.length.to!int, height);
       attachListener(spec);
 
-      writeln(cindent, pending, spec.title.colorize(fg.light_black));
+      cwriteln(cindent, pending, spec.title.colorize(fg.light_black));
       height++;
       ntests++;
     }
@@ -86,13 +87,13 @@ class SpecReporter
     if(e is null)
     {
       nsucceeded++;
-      write(indent, succeeded, specTitle.colorize(fg.light_black));
+      cwrite(indent, succeeded, specTitle.colorize(fg.light_black));
     }
     else
     {
       app.put(Failure(specTitle, e));
       nfailed++;
-      write(indent, colorize(nfailed.to!string ~ ") " ~  specTitle, fg.red));
+      cwrite(indent, colorize(nfailed.to!string ~ ") " ~  specTitle, fg.red));
     }
 
     write("\033[u"); // return to where we were
@@ -103,10 +104,10 @@ class SpecReporter
 
   void summary()
   {
-    if(nsucceeded > 0) writefln("%3d passing".colorize(fg.green), nsucceeded);
+    if(nsucceeded > 0) cwritefln("%3d passing".colorize(fg.green), nsucceeded);
     if(nfailed > 0)
     {
-      writefln("%3d failing".colorize(fg.red), nfailed);
+      cwritefln("%3d failing".colorize(fg.red), nfailed);
       writeln();
     }
 
