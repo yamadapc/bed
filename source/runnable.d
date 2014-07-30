@@ -1,7 +1,7 @@
 import std.signals;
 import std.exception : collectException, AssertError;
 
-alias void delegate(Runnable) Block;
+alias void delegate() Block;
 
 class Runnable
 {

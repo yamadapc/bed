@@ -1,13 +1,11 @@
 import runnable;
 import suite;
 
-alias void delegate() SpecBlock;
-
 class Spec : Runnable
 {
-  SpecBlock block;
+  Block block;
 
-  this(const string title, Suite suite, SpecBlock _block)
+  this(const string title, Suite suite, Block _block)
   {
     block = _block;
     super(title, suite);
@@ -23,28 +21,28 @@ class Spec : Runnable
 
   unittest
   {
-    import bed : describe, Suite;
+    import bed : describe, it, Suite;
 
-    describe("Spec", (t) {
+    describe("Spec", {
       auto mockparent = new Suite("mock suite");
 
-      t.describe("this(title, suite, block)", (t) {
-        t.it("returns a normal spec, without executing the block", {
+      describe("this(title, suite, block)", {
+        it("returns a normal spec, without executing the block", {
           auto called = false;
           auto spec = new Spec("test spec", mockparent, { called = true; });
           assert(!called);
         });
       });
 
-      t.describe(".run()", (t) {
-        t.it("works when the delegate succeeds", {
+      describe(".run()", {
+        it("works when the delegate succeeds", {
           auto called = false;
           auto spec = new Spec("ok", mockparent, { called = true; });
           spec.run;
           assert(called);
         });
 
-        t.it("works when the delegate fails", {
+        it("works when the delegate fails", {
           auto spec = new Spec("test failure", mockparent, {
             throw new Exception("Wow");
           });

@@ -103,9 +103,12 @@ class SpecReporter
 
   void summary()
   {
-    writefln("%3d passing".colorize(fg.green), nsucceeded);
-    writefln("%3d failing".colorize(fg.red), nfailed);
-    writeln();
+    if(nsucceeded > 0) writefln("%3d passing".colorize(fg.green), nsucceeded);
+    if(nfailed > 0)
+    {
+      writefln("%3d failing".colorize(fg.red), nfailed);
+      writeln();
+    }
 
     foreach(i, failure; failures)
     {

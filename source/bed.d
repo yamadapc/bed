@@ -5,13 +5,39 @@ public import runnable;
 public import spec;
 public import suite;
 
-void describe(R = SpecReporter)(string title, SuiteBlock block)
+static Suite currentSuite;
+
+void describe(R = SpecReporter)(string title, Block block)
 {
-  auto suite = new Suite(title);
-  block(suite);
+  if(currentSuite is null)
+  {
+    currentSuite = new Suite(title);
+  }
+  else
+  {
+    auto suite = new Suite(title, currentSuite);
+    currentSuite.children ~= suite;
+    currentSuite = suite;
+  }
 
-  auto rep = new R(suite);
-  suite.run();
+  block();
 
-  assert(!suite.failed, "One or more tests failed");
+  if(!currentSuite.isRoot)
+  {
+    currentSuite = cast(Suite) currentSuite.parent;
+  }
+  else
+  {
+    auto rep = new R(currentSuite);
+    currentSuite.run();
+    assert(!currentSuite.failed, "One or more tests failed");
+    currentSuite = null;
+  }
+}
+
+void it(string title, Block block)
+{
+  auto spec = new Spec(title, currentSuite, block);
+  currentSuite.specs ~= spec;
+  spec.connect(&currentSuite.propagateFailure);
 }
