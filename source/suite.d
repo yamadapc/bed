@@ -53,11 +53,11 @@ class Suite : Runnable
       });
 
       describe(".isRoot", {
-        it("returns true if the suite is parentless", {
+        it("is true if the suite is parentless", {
           assert(new Suite("root").isRoot);
         });
 
-        it("returns false if the suite is a child", {
+        it("is false if the suite is a child", {
           assert(!(new Suite("child", new Suite("root")).isRoot));
         });
       });
