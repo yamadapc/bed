@@ -21,25 +21,25 @@ int add(int x, int y)
 unittest
 {
 
-describe("add(x, y)", (t) { t
-  .it("1 + 3 = 3", (t) {
+describe("add(x, y)", {
+  it("1 + 3 = 3", {
     assert(add(1, 3) == 4);
   })
 
-  .it("1 + 10 = 4", (t) {
+  it("1 + 10 = 4", {
     assert(add(1, 10) == 11);
   })
 
-  .it("2 + 2 = 5 (meant to fail)", (t) {
+  it("2 + 2 = 5 (meant to fail)", {
     assert(add(2, 2) == 5, "what the hell happened?");
   })
 
-  .describe("when x is a negative number", (t) { t
-    .it("-10 + 2 = -8", (t) {
+  describe("when x is a negative number", {
+    it("-10 + 2 = -8", {
       assert(add(-10, 2) == -8);
     })
 
-    .it("-2 - 2 = -5", (t) {
+    it("-2 - 2 = -5", {
       assert(add(-2, -2) == -5, "oh my!");
     });
   });
