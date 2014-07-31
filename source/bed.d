@@ -17,7 +17,7 @@ void describe(string title, Block block)
   else
   {
     auto suite = new Suite(title, currentSuite);
-    currentSuite.children ~= suite;
+    currentSuite.suites ~= suite;
     currentSuite = suite;
   }
 
@@ -51,7 +51,7 @@ static ~this()
   foreach(suite; suites)
   {
     suite.parent = rootSuite;
-    rootSuite.children ~= suite;
+    rootSuite.suites ~= suite;
   }
 
   auto rep = new SpecReporter(rootSuite);

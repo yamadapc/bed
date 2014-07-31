@@ -4,7 +4,7 @@ import spec;
 class Suite : Runnable
 {
   bool isRoot = false;
-  Suite[] children;
+  Suite[] suites;
   Spec[] specs;
 
   this(const string title, Suite parent)
@@ -25,9 +25,9 @@ class Suite : Runnable
       spec.run;
     }
 
-    foreach(Suite child; children)
+    foreach(Suite suite; suites)
     {
-      child.run;
+      suite.run;
     }
   }
 

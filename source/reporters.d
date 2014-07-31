@@ -57,7 +57,7 @@ class SpecReporter
       ntests++;
     }
 
-    foreach(child; suite.children) draw(child, cindent);
+    foreach(s; suite.suites) draw(s, cindent);
 
     if(suite.isRoot)
     {
