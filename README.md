@@ -1,6 +1,7 @@
 bed
 ===
 [![Build Status](https://travis-ci.org/yamadapc/bed.svg?branch=master)](https://travis-ci.org/yamadapc/bed)
+[![Gitter chat](https://badges.gitter.im/yamadapc/bed.png)](https://gitter.im/yamadapc/bed)
 - - -
 
 **bed** is a BDD testing framework for D heavily inspired by TJ Holowaychuk's
