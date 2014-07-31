@@ -41,6 +41,18 @@ void it(string title, Block block)
   spec.connect(&currentSuite.propagateFailure);
 }
 
+void before(Block block)
+{ currentSuite.befores ~= block; }
+
+void beforeEach(Block block)
+{ currentSuite.beforeEachs ~= block; }
+
+void after(Block block)
+{ currentSuite.afters = block ~ currentSuite.afters; }
+
+void afterEach(Block block)
+{ currentSuite.afterEachs = block ~ currentSuite.afterEachs; }
+
 static ~this()
 {
   import std.c.process : exit;

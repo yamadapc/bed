@@ -7,6 +7,11 @@ class Suite : Runnable
   Suite[] suites;
   Spec[] specs;
 
+  Block[] befores;
+  Block[] beforeEachs;
+  Block[] afters;
+  Block[] afterEachs;
+
   this(const string title, Suite parent)
   {
     super(title, parent);
@@ -20,20 +25,22 @@ class Suite : Runnable
 
   override void run()
   {
-    foreach(Spec spec; specs)
-    {
-      spec.run;
-    }
+    foreach(before; befores) before();
+    foreach(Spec spec; specs) runChild(spec);
+    foreach(Suite suite; suites) runChild(suite);
+    foreach(after; afters) after();
+  }
 
-    foreach(Suite suite; suites)
-    {
-      suite.run;
-    }
+  private void runChild(T)(T child)
+  {
+    foreach(before; beforeEachs) before();
+    child.run;
+    foreach(after; afterEachs) after();
   }
 
   unittest
   {
-    import bed : describe, it, Suite;
+    import bed : describe, it, before, after, beforeEach, afterEach, Suite;
 
     describe("Suite", {
       describe("this(title)", {
@@ -59,6 +66,36 @@ class Suite : Runnable
 
         it("is false if the suite is a child", {
           assert(!(new Suite("child", new Suite("root")).isRoot));
+        });
+      });
+
+      describe("Member before/after family blocks", {
+        Suite rootsuite;
+        beforeEach({
+          rootsuite = new Suite("Root Suite");
+        });
+
+        it("starts uninitialized", {
+          assert(rootsuite.befores.length == 0);
+          assert(rootsuite.afters.length == 0);
+          assert(rootsuite.beforeEachs.length == 0);
+          assert(rootsuite.afterEachs.length == 0);
+        });
+
+        it("runs `befores` in order before all 'child' blocks", {
+          auto ran1 = false;
+          auto ran2 = false;
+
+          rootsuite.befores = [
+            { assert(!ran2); ran1 = true; },
+            { ran2 = true; }
+          ];
+          assert(rootsuite.suites.length == 0);
+          assert(rootsuite.specs.length == 0);
+
+          rootsuite.run;
+          assert(ran1);
+          assert(ran2);
         });
       });
     });
