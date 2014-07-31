@@ -5,9 +5,10 @@ public import runnable;
 public import spec;
 public import suite;
 
+static Suite[] suites;
 static Suite currentSuite;
 
-void describe(R = SpecReporter)(string title, Block block)
+void describe(string title, Block block)
 {
   if(currentSuite is null)
   {
@@ -28,9 +29,7 @@ void describe(R = SpecReporter)(string title, Block block)
   }
   else
   {
-    auto rep = new R(currentSuite);
-    currentSuite.run();
-    assert(!currentSuite.failed, "One or more tests failed");
+    suites ~= currentSuite;
     currentSuite = null;
   }
 }
@@ -40,4 +39,22 @@ void it(string title, Block block)
   auto spec = new Spec(title, currentSuite, block);
   currentSuite.specs ~= spec;
   spec.connect(&currentSuite.propagateFailure);
+}
+
+static ~this()
+{
+  import std.c.process : exit;
+  import colorize : fg;
+  import colorize.colorize : colorize;
+  auto rootSuite = new Suite("\n -- bed --\n".colorize(fg.yellow));
+
+  foreach(suite; suites)
+  {
+    suite.parent = rootSuite;
+    rootSuite.children ~= suite;
+  }
+
+  auto rep = new SpecReporter(rootSuite);
+  rootSuite.run();
+  if(rootSuite.failed) exit(1);
 }
