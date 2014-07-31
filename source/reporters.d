@@ -42,7 +42,7 @@ class SpecReporter
 
   void draw(Suite suite, const string indent = "  ")
   {
-    writeln(indent ~ suite.title);
+    cwriteln(indent ~ suite.title);
     height++;
 
     auto cindent = indent ~ "  ";
@@ -115,13 +115,13 @@ class SpecReporter
     {
       auto title = failure[0];
       auto e = failure[1];
-      writefln("%3d) %s:", ++i, title);
-      writefln(
+      cwritefln("%3d) %s:", ++i, title);
+      cwritefln(
         "     %s %s",
         e.msg.colorize(fg.red),
         (e.file ~ "L" ~ e.line.to!string).colorize(fg.magenta)
       );
-      writefln(
+      cwritefln(
         "     %s",
         replaceAll(e.info.to!string, regex("\n"), "\n     ")
         .colorize(fg.light_black)
