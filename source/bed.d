@@ -56,9 +56,8 @@ void afterEach(Block block)
 static ~this()
 {
   import std.c.process : exit;
-  import colorize : fg;
-  import colorize.colorize : colorize;
-  auto rootSuite = new Suite("\n -- bed --\n".colorize(fg.yellow));
+  import colorize : fg, color;
+  auto rootSuite = new Suite("\n -- bed --\n".color(fg.yellow));
 
   foreach(suite; suites)
   {

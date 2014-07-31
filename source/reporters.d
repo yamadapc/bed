@@ -15,15 +15,14 @@ class SpecReporter
   import std.stdio : writeln, writefln, writef, write;
   import std.typecons : Tuple;
 
-  import colorize : cwrite, cwriteln, cwritefln, fg;
-  import colorize.colorize : colorize;
+  import colorize : cwrite, cwriteln, cwritefln, fg, color;
 
   alias Tuple!(string, Throwable) Failure;
   alias Tuple!(int, int) Point;
 
-  static immutable string succeeded = "✓ ".colorize(fg.green);
-  static immutable string failed = "✖︎ ".colorize(fg.red);
-  static immutable string pending = "● ".colorize(fg.yellow);
+  static immutable string succeeded = "✓ ".color(fg.green);
+  static immutable string failed = "✖︎ ".color(fg.red);
+  static immutable string pending = "● ".color(fg.yellow);
 
   Failure[] failures;
   RefAppender!(Failure[]) app;
@@ -52,7 +51,7 @@ class SpecReporter
       specPositions[spec.title] = Point(cindent.length.to!int, height);
       attachListener(spec);
 
-      cwriteln(cindent, pending, spec.title.colorize(fg.light_black));
+      cwriteln(cindent, pending, spec.title.color(fg.light_black));
       height++;
       ntests++;
     }
@@ -87,13 +86,13 @@ class SpecReporter
     if(e is null)
     {
       nsucceeded++;
-      cwrite(indent, succeeded, specTitle.colorize(fg.light_black));
+      cwrite(indent, succeeded, specTitle.color(fg.light_black));
     }
     else
     {
       app.put(Failure(specTitle, e));
       nfailed++;
-      cwrite(indent, colorize(nfailed.to!string ~ ") " ~  specTitle, fg.red));
+      cwrite(indent, color(nfailed.to!string ~ ") " ~  specTitle, fg.red));
     }
 
     write("\033[u"); // return to where we were
@@ -104,10 +103,10 @@ class SpecReporter
 
   void summary()
   {
-    if(nsucceeded > 0) cwritefln("%3d passing".colorize(fg.green), nsucceeded);
+    if(nsucceeded > 0) cwritefln("%3d passing".color(fg.green), nsucceeded);
     if(nfailed > 0)
     {
-      cwritefln("%3d failing".colorize(fg.red), nfailed);
+      cwritefln("%3d failing".color(fg.red), nfailed);
       writeln();
     }
 
@@ -118,13 +117,13 @@ class SpecReporter
       cwritefln("%3d) %s:", ++i, title);
       cwritefln(
         "     %s %s",
-        e.msg.colorize(fg.red),
-        (e.file ~ "L" ~ e.line.to!string).colorize(fg.magenta)
+        e.msg.color(fg.red),
+        (e.file ~ "L" ~ e.line.to!string).color(fg.magenta)
       );
       cwritefln(
         "     %s",
         replaceAll(e.info.to!string, regex("\n"), "\n     ")
-        .colorize(fg.light_black)
+        .color(fg.light_black)
       );
     }
 
