@@ -26,16 +26,16 @@ class Suite : Runnable
   override void run()
   {
     foreach(before; befores) before();
+    scope(exit) foreach(after; afters) after();
     foreach(Spec spec; specs) runChild(spec);
     foreach(Suite suite; suites) runChild(suite);
-    foreach(after; afters) after();
   }
 
   private void runChild(T)(T child)
   {
     foreach(before; beforeEachs) before();
+    scope(exit) foreach(after; afterEachs) after();
     child.run;
-    foreach(after; afterEachs) after();
   }
 
   unittest
