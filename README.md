@@ -2,6 +2,7 @@ bed
 ===
 [![Build Status](https://travis-ci.org/yamadapc/bed.svg?branch=master)](https://travis-ci.org/yamadapc/bed)
 [![Gitter chat](https://badges.gitter.im/yamadapc/bed.png)](https://gitter.im/yamadapc/bed)
+[![Analytics](https://ga-beacon.appspot.com/UA-54450544-1/bed/README)](https://github.com/igrigorik/ga-beacon)
 - - -
 
 **bed** is a BDD testing framework for D heavily inspired by TJ Holowaychuk's
