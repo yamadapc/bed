@@ -8,29 +8,27 @@ import std.typecons : Tuple;
 alias Block = void delegate();
 alias ParallelBlock = void function();
 
-struct SerialTestCase
+struct TestCase(F)
+  if(isSomeFunction!F)
 {
   string title;
-  Block block;
+  F block;
 }
 
-struct ParallelTestCase
-{
-  string title;
-  ParallelBlock block;
-}
+alias SerialTestCase = TestCase!Block;
+alias ParallelTestCase = TestCase!ParallelBlock;
 
 struct TestSuite
 {
   immutable string title;
 
-  TestSuite[] testSuites;
-  SerialTestCase[] serialTestCases;
-  ParallelTestCase[] parallelTestCases;
+  TestSuite*[] testSuites;
+  SerialTestCase*[] serialTestCases;
+  ParallelTestCase*[] parallelTestCases;
 
-  void add(TestSuite ts) { testSuites ~= ts; }
-  void add(SerialTestCase tc) { serialTestCases ~= tc; }
-  void add(ParallelTestCase tc) { parallelTestCases ~= tc; }
+  void add(ref TestSuite ts) { testSuites ~= &ts; }
+  void add(ref SerialTestCase tc) { serialTestCases ~= &tc; }
+  void add(ref ParallelTestCase tc) { parallelTestCases ~= &tc; }
 }
 
 template isTest(T)
