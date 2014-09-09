@@ -7,9 +7,7 @@
     "Pedro Tacla Yamada"
   ],
   "dependencies": {
-    "ncurses": "~master",
-    "colorize": ">=1.0.1",
-    "pyjamas": "~master"
+    "colorize": ">=1.0.1"
   },
   "configurations": [
     {
