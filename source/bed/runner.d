@@ -1,4 +1,7 @@
-// Test suite/case runner
+/**
+ * Eager threaded TestCase runner.
+ */
+
 module bed.runner;
 
 import std.concurrency;
@@ -9,29 +12,31 @@ import core.thread;
 import bed.tests;
 import colorize;
 
+alias object.Throwable.TraceInfo TraceInfo;
+
 /**
- * Immutable result data type. If a result isn't a failure, it's a assumed to be
+ * Result data type. If a result isn't a failure, it's a assumed to be
  * a success.
  */
 
 struct TestCaseResult
 {
-  immutable string title;
+  string title;
 }
 
 /**
- * Immutable failure data type. Aliases to the default result struct, retaining
+ * Failure data type. Aliases to the default result struct, retaining
  * its fields and interface.
  */
 
 struct TestCaseFailure
 {
-  immutable string msg;
-  immutable object.Throwable.TraceInfo info;
-  immutable string file;
-  immutable size_t line;
+  string msg;
+  string info;
+  string file;
+  size_t line;
 
-  immutable TestCaseResult rs;
+  TestCaseResult rs;
   alias rs this;
 }
 
@@ -60,21 +65,28 @@ void startRunner()
  * Executes a test case `tc`, sending a failure or success back to owner `tid`.
  */
 
-private void runTestCase(Tid tid, ParallelTestCase tc)
+private void runTestCase(Tid owner, ParallelTestCase tc)
 {
   try
   {
     tc.block();
-    send(tid, tc.title, true);
+    owner.send(
+      TestCaseResult(tc.title)
+    );
   }
   catch(Throwable err)
   {
-    send(tid, ImmutableError(err.msg.idup, err.info.assumeImmutable, err.file, err.line));
+    owner.send(
+      TestCaseFailure(err.msg, err.info.toString(), err.file, err.line,
+        TestCaseResult(tc.title))
+    );
   }
 }
 
 unittest
 {
+  import pyjamas;
+
   Tid tid = spawn(&startRunner);
 
   auto tc1 = ParallelTestCase("Slow and buggy", {
@@ -88,17 +100,20 @@ unittest
   });
   send(tid, thisTid, tc2);
 
+  // We should receive a TestCaseResult from tc2 first
   receive(
-    (string title, string msg) =>
-      cwritefln("%s\n%s".color(fg.red), title, msg),
-    (string title, bool ok) =>
-      cwriteln(title.color(fg.green))
+    (TestCaseResult result) {
+      result.title.should.equal("Fast and awesome");
+    }
   );
 
+  // We should now receive a TestCaseFailure from tc1
   receive(
-    (string title, string msg) =>
-      cwritefln("%s\n%s".color(fg.red), title, msg),
-    (string title, bool ok) =>
-      cwriteln(title.color(fg.green))
+    (TestCaseFailure result) {
+      result.title.should.equal("Slow and buggy");
+    },
+    (TestCaseResult _) {
+      assert(false, "TestCaseFailure wasn't sent");
+    }
   );
 }
