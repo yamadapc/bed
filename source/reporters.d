@@ -20,9 +20,18 @@ class SpecReporter
   alias Tuple!(string, Throwable) Failure;
   alias Tuple!(int, int) Point;
 
-  static immutable string succeeded = "✓ ".color(fg.green);
-  static immutable string failed = "✖︎ ".color(fg.red);
-  static immutable string pending = "● ".color(fg.yellow);
+  version(Windows)
+  {
+    static immutable string succeeded = "[P] ".color(fg.green);
+    static immutable string failed = "[F] ".color(fg.red);
+    static immutable string pending = "[?] ".color(fg.yellow);
+  }
+  else
+  {
+    static immutable string succeeded = "✓ ".color(fg.green);
+    static immutable string failed = "✖︎ ".color(fg.red);
+    static immutable string pending = "● ".color(fg.yellow);
+  }
 
   Failure[] failures;
   RefAppender!(Failure[]) app;
@@ -73,16 +82,35 @@ class SpecReporter
   void updateSpec(string specTitle, Throwable e)
   {
 
-    write("\033[s"); // save cursor position
-
     auto pos = specPositions[specTitle];
 
-    writef("\033[%dA", height - pos[1]);
-    write("\033[K"); // delete until the end of the line
+    version(Windows)
+    {
+      import std.c.windows.windows;
+      // What is our HWND?
+      auto hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+      // save cursor position
+      CONSOLE_SCREEN_BUFFER_INFO SBInfo;
+      hConsole.GetConsoleScreenBufferInfo(&SBInfo);
+      auto prevCoords = SBInfo.dwCursorPosition;
+      // Move to edit old line
+      auto lPos = prevCoords.Y - (height - pos[1]);
+      hConsole.SetConsoleCursorPosition(COORD(0, cast(short)lPos));
+      // delete line contents
+      foreach(i; 0 .. SBInfo.dwSize.X)
+        write("\b");
+      hConsole.SetConsoleCursorPosition(COORD(0, cast(short)lPos));
+    }
+    else
+    {
+      write("\033[s"); // save cursor position
+      writef("\033[%dA", height - pos[1]);
+      write("\033[K"); // delete until the end of the line
+    }
 
     auto indent = "";
     for(auto i = 0; i < pos[0]; i++) indent ~= " ";
-
+    
     if(e is null)
     {
       nsucceeded++;
@@ -95,8 +123,13 @@ class SpecReporter
       cwrite(indent, color(nfailed.to!string ~ ") " ~  specTitle, fg.red));
     }
 
-    write("\033[u"); // return to where we were
-
+    version(Windows)
+    {
+      hConsole.SetConsoleCursorPosition(prevCoords);
+    }
+    else
+      write("\033[u"); // return to where we were
+    
     // We are done, print summary
     if(nsucceeded + nfailed == ntests) summary();
   }

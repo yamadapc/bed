@@ -38,6 +38,7 @@ class Suite : Runnable
     child.run;
   }
 
+  version(BED_SELFTEST)
   unittest
   {
     import bed : describe, it, before, after, beforeEach, afterEach, Suite;
