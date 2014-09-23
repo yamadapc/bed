@@ -19,6 +19,7 @@ class Spec : Runnable
     end(e);
   }
 
+  version(BED_SELFTEST)
   unittest
   {
     import bed : describe, it, Suite;
