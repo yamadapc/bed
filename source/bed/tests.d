@@ -1,7 +1,6 @@
 // Test data structures
 module bed.tests;
 
-import std.functional : partial;
 import std.traits : isSomeFunction;
 import std.typecons : Tuple;
 
