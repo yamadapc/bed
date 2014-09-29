@@ -29,6 +29,19 @@
       "dflags": [
         "-main"
       ]
+    },
+    {
+      "name": "examples",
+      "targetType": "executable",
+      "sourcePaths": [
+        "examples"
+      ],
+      "buildOptions": [
+        "unittests"
+      ],
+      "dflags": [
+        "-main"
+      ]
     }
   ]
 }
