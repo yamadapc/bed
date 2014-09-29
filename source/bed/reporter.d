@@ -69,6 +69,8 @@ shared class SpecReporter : Reporter
   void onTestCaseFailure(TestCaseFailure tc)
   {
     cwritefln("New test case failure: '%s'".color(fg.red), tc.title);
+    cwritefln("   ERROR: '%s'".color(fg.red), tc.msg);
+    cwritefln("   INFO:\n%s".color(fg.red), tc.info);
   }
 
   void onTestCaseSuccess(TestCaseResult tc)
