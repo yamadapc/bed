@@ -4,7 +4,10 @@
 
 module bed.reporter;
 
+import std.algorithm;
+import std.array;
 import std.concurrency : OwnerTerminated, receive, Tid;
+import std.datetime;
 import std.stdio;
 
 import colorize;
@@ -42,14 +45,21 @@ shared interface Reporter
 
 shared class SpecReporter : Reporter
 {
+  private void log(T...)(string fmt, T vs)
+  {
+    auto now = Clock.currTime.toSimpleString.splitter(' ').array[1][0..8];
+    auto timestamp = "[" ~ now ~ "] ";
+    cwritefln(timestamp ~ fmt, vs);
+  }
+
   void onNewRootTestSuite(string ts)
   {
-    cwritefln("New root test suite: '%s'".color(fg.yellow), ts);
+    log("New root test suite: '%s'".color(fg.yellow), ts);
   }
 
   void onNewTestSuite(string ts, string parentTs)
   {
-    cwritefln(
+    log(
       "New test suite: '%s' (came from %s)".color(fg.yellow),
       ts,
       parentTs
@@ -58,23 +68,23 @@ shared class SpecReporter : Reporter
 
   void onNewSerialTestCase(SerialTestCase tc)
   {
-    cwritefln("New serial test case: '%s'".color(fg.yellow), tc.title);
+    log("New serial test case: '%s'".color(fg.yellow), tc.title);
   }
 
   void onNewParallelTestCase(ParallelTestCase tc)
   {
-    cwritefln("New parallel test case '%s'".color(fg.magenta), tc.title);
+    log("New parallel test case '%s'".color(fg.magenta), tc.title);
   }
 
   void onTestCaseFailure(TestCaseFailure tc)
   {
-    cwritefln("New test case failure: '%s'".color(fg.red), tc.title);
-    cwritefln("   ERROR: '%s'".color(fg.red), tc.msg);
-    cwritefln("   INFO:\n%s".color(fg.red), tc.info);
+    log("New test case failure: '%s'".color(fg.red), tc.title);
+    log("   ERROR: '%s'".color(fg.red), tc.msg);
+    log("   INFO:\n%s".color(fg.red), tc.info);
   }
 
   void onTestCaseSuccess(TestCaseResult tc)
   {
-    cwritefln("New test case success: '%s'".color(fg.green), tc.title);
+    log("New test case success: '%s'".color(fg.green), tc.title);
   }
 }
