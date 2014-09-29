@@ -5,54 +5,74 @@
 module bed.reporter;
 
 import std.concurrency : OwnerTerminated, receive, Tid;
+import std.stdio;
+
+import colorize;
 
 import bed.runner;
 import bed.tests;
 
-void startReporter(Reporter r)
+shared interface Reporter
 {
-  auto running = true;
-  while(running)
+  void onNewRootTestSuite(string);
+  void onNewTestSuite(string, string);
+  void onNewSerialTestCase(SerialTestCase);
+  void onNewParallelTestCase(ParallelTestCase);
+  void onTestCaseFailure(TestCaseFailure);
+  void onTestCaseSuccess(TestCaseResult);
+
+  final void start()
   {
-    receive(
-      r.onNewTestSuite,
-      r.onNewTestCase,
-      r.onTestCaseFailure,
-      r.onTestCaseSuccess,
-      (OwnerTerminated _) { running = false; }
-    );
+    writeln("Starting reporter");
+    auto running = true;
+    while(running)
+    {
+      receive(
+        &onNewTestSuite,
+        &onNewRootTestSuite,
+        &onNewSerialTestCase,
+        &onNewParallelTestCase,
+        &onTestCaseFailure,
+        &onTestCaseSuccess,
+        (OwnerTerminated _) { running = false; }
+      );
+    }
   }
 }
 
-import std.stdio : writefln;
-Reporter TextReporter = tuple(
-  textReporterOnNewTestCase,
-
-  void onTestCaseSuccess(TestCaseResult succ)
-  {
-    "TestCase %s passed".writefln(succ.title);
-  },
-
-  void onTestCaseFailure(TestCaseFailure fail)
-  {
-    "TestCase %s failed".writefln(fail.title);
-  }
-);
-
-void textReporterOnNewTestCase(TestSuite ts)
+shared class SpecReporter : Reporter
 {
-  "TestSuite %s found".writefln(ts.title);
-},
+  void onNewRootTestSuite(string ts)
+  {
+    cwritefln("New root test suite: '%s'".color(fg.yellow), ts);
+  }
 
+  void onNewTestSuite(string ts, string parentTs)
+  {
+    cwritefln(
+      "New test suite: '%s' (came from %s)".color(fg.yellow),
+      ts,
+      parentTs
+    );
+  }
 
-alias onNewTestSuite = void delegate(TestSuite);
-alias onNewTestCase = void delegate(F)(F) if(isTest!F);
-alias onTestCaseFailure = void delegate(TestCaseFailure);
-alias onTestCaseSuccess = void delegate(TestCaseResult);
-alias Reporter = Tuple!(
-  onNewTestSuite, "onNewTestSuite",
-  onNewTestCase, "onNewTestCase",
-  onTestCaseFailure, "onTestCaseFailure",
-  onTestCaseSuccess, "onTestCaseSuccess"
-);
+  void onNewSerialTestCase(SerialTestCase tc)
+  {
+    cwritefln("New serial test case: '%s'".color(fg.yellow), tc.title);
+  }
 
+  void onNewParallelTestCase(ParallelTestCase tc)
+  {
+    cwritefln("New parallel test case '%s'".color(fg.magenta), tc.title);
+  }
+
+  void onTestCaseFailure(TestCaseFailure tc)
+  {
+    cwritefln("New test case failure: '%s'".color(fg.red), tc.title);
+  }
+
+  void onTestCaseSuccess(TestCaseResult tc)
+  {
+    cwritefln("New test case success: '%s'".color(fg.green), tc.title);
+  }
+}
