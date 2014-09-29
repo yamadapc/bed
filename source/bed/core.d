@@ -37,7 +37,7 @@ static struct BedConfig
 {
   bool eagerRun = true;
   bool parallelize = true;
-  //Reporter[] reporters = [new SpecReporter];
+  Reporter[] reporters = [];
 }
 
 /**
@@ -48,9 +48,7 @@ static struct BedConfig
 shared static this()
 {
   runner = spawn(&startRunner);
-  reporters = [
-    spawn(&startReporter!SpecReporter)
-  ];
+  reporters ~= spawn(&(new SpecReporter()).start);
 }
 
 /**
@@ -83,6 +81,10 @@ private void withTestSuite(B)(ref TestSuite ts, B block)
 void addTestSuite(immutable string title, Block block)
 {
   auto ts = TestSuite(title);
+
+  if(currentTs !is null) notifyReporters(ts.title, (*currentTs).title);
+  else notifyReporters(ts.title);
+
   withTestSuite(ts, block);
 }
 
@@ -114,25 +116,37 @@ void addTestCase(F)(immutable string title, F block)
 {
   auto tc = TestCase!F(title, block);
   (*currentTs).add(tc);
+
+  notifyReporters(tc);
+
   static if(is(typeof(tc) == ParallelTestCase))
   {
-    runner.send(tc);
+    runner.send(reporters[0], tc);
   }
   else
   {
     try
     {
       tc.block();
-      foreach(reporter; reporters)
-        reporter.send(TestCaseResult(tc.title));
+      notifyReporters(
+        TestCaseResult(tc.title)
+      );
     }
     catch(Throwable err)
     {
-      foreach(reporter; reporters)
-        reporter.send(
-            TestCaseFailure(err.msg, err.info.toString(), err.file, err.line,
-              TestCaseResult(tc.title)));
-      
+      notifyReporters(
+        TestCaseFailure(err.msg, err.info.toString(), err.file, err.line,
+          TestCaseResult(tc.title))
+      );
     }
   }
+}
+
+/**
+ * Sends all reporters some message.
+ */
+
+void notifyReporters(T...)(T xs)
+{
+  foreach(reporter; reporters) reporter.send(xs);
 }
