@@ -20,11 +20,9 @@
       "name": "unittest",
       "targetType": "executable",
       "sourcePaths": [
-        "source",
-        "tests"
+        "source"
       ],
       "buildOptions": [
-        "unittests"
       ],
       "dflags": [
         "-main"
@@ -37,7 +35,6 @@
         "examples"
       ],
       "buildOptions": [
-        "unittests"
       ],
       "dflags": [
         "-main"
