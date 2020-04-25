@@ -7,6 +7,6 @@
     "Pedro Tacla Yamada"
   ],
   "dependencies": {
-    "colorize": ">=1.0.1"
+    "colorize": ">=1.0.5"
   }
 }

@@ -55,7 +55,7 @@ void afterEach(Block block)
 
 static ~this()
 {
-  import std.c.process : exit;
+  import core.stdc.stdlib : exit;
   import colorize : fg, color;
   auto rootSuite = new Suite("\n -- bed --\n".color(fg.yellow));
 
@@ -67,5 +67,7 @@ static ~this()
 
   auto rep = new SpecReporter(rootSuite);
   rootSuite.run();
-  if(rootSuite.failed) exit(1);
+  if (rootSuite.failed) {
+    exit(1);
+  }
 }
