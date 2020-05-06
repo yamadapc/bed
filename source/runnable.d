@@ -1,6 +1,5 @@
 import std.signals;
 import std.exception : collectException;
-//import core.exception : AssertError;
 
 alias void delegate() Block;
 
